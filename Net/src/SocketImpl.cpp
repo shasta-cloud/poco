@@ -18,6 +18,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
+#include <iostream>
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
@@ -668,6 +669,9 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	}
 
 	Poco::Timespan remainingTime(timeout);
+    std::cerr << "Starting poll, remainingtime =  " << remainingTime.totalMilliseconds() << std::endl;
+    //logger().information("Starting poll, remainingtime = " + remainingTime.totalMilliseconds());
+    //std::cout << "Starting poll, remainingtime = " << remainingTime.totalMilliseconds() << std::endl;
 	int rc;
 	do
 	{
@@ -687,6 +691,10 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		}
 	}
 	while (rc < 0 && lastError() == POCO_EINTR);
+
+    std::cerr << "Poll done rc " << rc << " The remaining time is = " << remainingTime.totalMilliseconds() << std::endl;
+    //logger().information("Poll done rc " + rc + " The remaining time is = " + remainingTime.totalMilliseconds());
+    //std::cout << "Poll done rc = " << rc << " The remaining time is = " << remainingTime.totalMilliseconds()<< std::endl;
 
 	::close(epollfd);
 	if (rc < 0) error();

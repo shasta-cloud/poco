@@ -198,7 +198,7 @@ public:
 		///
 		/// Always returns zero for platforms where not implemented.
 
-	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& timeout = 100000);
+	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& timeout = 10000000);
 		/// Receives data from the socket and stores it in the buffer.
 		/// If needed, the buffer will be resized to accomodate the
 		/// data. Note that this function may impose additional

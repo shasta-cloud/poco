@@ -323,8 +323,13 @@ void SocketImpl::checkBrokenTimeout(SelectMode mode)
 		Poco::Timespan timeout = (mode == SELECT_READ) ? _recvTimeout : _sndTimeout;
 		if (timeout.totalMicroseconds() != 0)
 		{
-			if (!poll(timeout, mode))
-				throw TimeoutException();
+
+	printf("%s %d before poll timeout.millisecons %d microsconds %d \n",
+            __func__, __LINE__, timeout.totalMicroseconds(), timeout.totalMilliseconds() );
+			if (!poll(timeout, mode)){
+
+	printf("%s %d throw poll\n", __func__, __LINE__);
+				throw TimeoutException();}
 		}
 	}
 }
@@ -373,6 +378,7 @@ int SocketImpl::sendBytes(const SocketBufVec& buffers, int flags)
 
 int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 {
+	printf("%s %d before checkBrokenTimeout\n", __func__, __LINE__);
 	checkBrokenTimeout(SELECT_READ);
 
 	printf("%s %d past checkBrokenTimeout\n", __func__, __LINE__);
@@ -404,6 +410,7 @@ int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 
 int SocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
 {
+	printf("%s %d before checkBrokenTimeout\n", __func__, __LINE__);
 	checkBrokenTimeout(SELECT_READ);
 
 	printf("%s %d past checkBrokenTimeout\n", __func__, __LINE__);
@@ -445,6 +452,7 @@ int SocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
 int SocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco::Timespan& timeout)
 {
 	int rc = 0;
+	printf("%s %d before poll\n", __func__, __LINE__);
 	if (poll(timeout, SELECT_READ))
 	{
 		printf("%s %d past poll\n", __func__, __LINE__);

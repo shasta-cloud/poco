@@ -51,6 +51,8 @@ else()
 	message(FATAL_ERROR "Compiler does not support C++14.")
 endif()
 
+set(CMAKE_BUILD_TYPE Debug)
+
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()

@@ -201,6 +201,7 @@ int WebSocketImpl::receivePayload(char *buffer, int payloadLength, char mask[4],
 
 int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 {
+    printf("%s %d \n", __func__, __LINE__);
 	char mask[4];
 	bool useMask;
 	_frameFlags = 0;
@@ -215,6 +216,7 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 
 int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Timespan&)
 {
+    printf("%s %d \n", __func__, __LINE__);
 	char mask[4];
 	bool useMask;
 	_frameFlags = 0;

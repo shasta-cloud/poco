@@ -337,7 +337,9 @@ void SocketImpl::checkBrokenTimeout(SelectMode mode)
 
 int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
+    printf("before %s %d \n", __func__, __LINE__);
 	checkBrokenTimeout(SELECT_WRITE);
+    printf("after %s %d \n", __func__, __LINE__);
 
 	int rc;
 	do
@@ -353,7 +355,9 @@ int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 
 int SocketImpl::sendBytes(const SocketBufVec& buffers, int flags)
 {
+    printf("before %s %d \n", __func__, __LINE__);
 	checkBrokenTimeout(SELECT_WRITE);
+    printf("after %s %d \n", __func__, __LINE__);
 
 	int rc = 0;
 	do
@@ -552,7 +556,9 @@ int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, in
 
 int SocketImpl::receiveFrom(void* buffer, int length, struct sockaddr** ppSA, poco_socklen_t** ppSALen, int flags)
 {
+    printf("%s %d \n", __func__, __LINE__);
 	checkBrokenTimeout(SELECT_READ);
+    printf("%s %d \n", __func__, __LINE__);
 	int rc;
 	do
 	{
@@ -565,8 +571,10 @@ int SocketImpl::receiveFrom(void* buffer, int length, struct sockaddr** ppSA, po
 		int err = lastError();
 		if (err == POCO_EAGAIN && !_blocking)
 			;
-		else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
+		else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT) {
+            printf("before error %s %d \n", __func__, __LINE__);
 			throw TimeoutException(err);
+        }
 		else
 			error(err);
 	}
@@ -591,7 +599,9 @@ int SocketImpl::receiveFrom(SocketBufVec& buffers, SocketAddress& address, int f
 
 int SocketImpl::receiveFrom(SocketBufVec& buffers, struct sockaddr** pSA, poco_socklen_t** ppSALen, int flags)
 {
+    printf("before %s %d \n", __func__, __LINE__);
 	checkBrokenTimeout(SELECT_READ);
+    printf("after %s %d \n", __func__, __LINE__);
 	int rc = 0;
 	do
 	{
@@ -722,7 +732,10 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
     //std::cout << "Poll done rc = " << rc << " The remaining time is = " << remainingTime.totalMilliseconds()<< std::endl;
 
 	::close(epollfd);
-	if (rc < 0) error();
+	if (rc < 0) {
+printf("before error %s %d \n", __func__, __LINE__);
+        error();
+    }
 	return rc > 0;
 
 #elif defined(POCO_HAVE_FD_POLL)
@@ -755,7 +768,10 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		}
 	}
 	while (rc < 0 && lastError() == POCO_EINTR);
-	if (rc < 0) error();
+	if (rc < 0) {
+    printf("before error %s %d \n", __func__, __LINE__);
+        error();
+    }
 	return rc > 0;
 
 #else
@@ -799,7 +815,10 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		}
 	}
 	while (rc < 0 && errorCode == POCO_EINTR);
-	if (rc < 0) error(errorCode);
+	if (rc < 0) {
+        printf("before error %s %d \n", __func__, __LINE__);
+        error(errorCode);
+    }
 	return rc > 0;
 
 #endif // POCO_HAVE_FD_EPOLL

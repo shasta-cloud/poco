@@ -158,6 +158,7 @@ int WebSocket::sendFrame(const void* buffer, int length, int flags)
 
 int WebSocket::receiveFrame(void* buffer, int length, int& flags)
 {
+    printf("%s %d \n", __func__, __LINE__);
 	int n = static_cast<WebSocketImpl*>(impl())->receiveBytes(buffer, length, 0);
 	flags = static_cast<WebSocketImpl*>(impl())->frameFlags();
 	return n;
@@ -166,6 +167,7 @@ int WebSocket::receiveFrame(void* buffer, int length, int& flags)
 
 int WebSocket::receiveFrame(Poco::Buffer<char>& buffer, int& flags)
 {
+printf("%s %d \n", __func__, __LINE__);
 	int n = static_cast<WebSocketImpl*>(impl())->receiveBytes(buffer, 0);
 	flags = static_cast<WebSocketImpl*>(impl())->frameFlags();
 	return n;

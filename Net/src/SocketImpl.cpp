@@ -375,22 +375,28 @@ int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 {
 	checkBrokenTimeout(SELECT_READ);
 
+	printf("%s %d past checkBrokenTimeout\n", __func__, __LINE__);
+
 	int rc;
 	do
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 		rc = ::recv(_sockfd, reinterpret_cast<char*>(buffer), length, flags);
+		printf("%s %d past ::recv ret is %d errno is %d\n", __func__, __LINE__, rc, lastError());
 	}
 	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0)
 	{
 		int err = lastError();
-		if (err == POCO_EAGAIN && !_blocking)
+		if (err == POCO_EAGAIN && !_blocking) {
 			;
-		else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
+		} else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT) {
+			printf("%s %d err is %d, throwing TimeoutException\n", __func__, __LINE__, err);
 			throw TimeoutException(err);
-		else
+		} else {
+			printf("%s %d err is not timeout (%d), throwing error(err)\n", __func__, __LINE__, err);
 			error(err);
+		}
 	}
 	return rc;
 }
@@ -399,6 +405,8 @@ int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 int SocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
 {
 	checkBrokenTimeout(SELECT_READ);
+
+	printf("%s %d past checkBrokenTimeout\n", __func__, __LINE__);
 
 	int rc = 0;
 	do
@@ -413,18 +421,22 @@ int SocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
 		rc = recvd;
 #elif defined(POCO_OS_FAMILY_UNIX)
 		rc = readv(_sockfd, &buffers[0], static_cast<int>(buffers.size()));
+		printf("%s %d past ::readv ret is %d errno is %d\n", __func__, __LINE__, rc, lastError());
 #endif
 	}
 	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0)
 	{
 		int err = lastError();
-		if (err == POCO_EAGAIN && !_blocking)
+		if (err == POCO_EAGAIN && !_blocking) {
 			;
-		else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
+		} else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT) {
+			printf("%s %d err is %d, throwing TimeoutException\n", __func__, __LINE__, err);
 			throw TimeoutException(err);
-		else
+		} else {
+			printf("%s %d err is not timeout (%d), throwing error(err)\n", __func__, __LINE__, err);
 			error(err);
+		}
 	}
 	return rc;
 }
@@ -435,6 +447,7 @@ int SocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco::
 	int rc = 0;
 	if (poll(timeout, SELECT_READ))
 	{
+		printf("%s %d past poll\n", __func__, __LINE__);
 		int avail = available();
 		if (buffer.size() < avail) buffer.resize(avail);
 
@@ -442,17 +455,21 @@ int SocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco::
 		{
 			if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 			rc = ::recv(_sockfd, buffer.begin(), static_cast<int>(buffer.size()), flags);
+			printf("%s %d past ::recv ret is %d errno is %d\n", __func__, __LINE__, rc, lastError());
 		}
 		while (_blocking && rc < 0 && lastError() == POCO_EINTR);
 		if (rc < 0)
 		{
 			int err = lastError();
-			if (err == POCO_EAGAIN && !_blocking)
+			if (err == POCO_EAGAIN && !_blocking) {
 				;
-			else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
+			} else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT) {
+				printf("%s %d err is %d, throwing TimeoutException\n", __func__, __LINE__, err);
 				throw TimeoutException(err);
-			else
+			} else {
+				printf("%s %d err is not timeout (%d), throwing error(err)\n", __func__, __LINE__, err);
 				error(err);
+			}
 		}
 		if (rc < buffer.size()) buffer.resize(rc);
 	}

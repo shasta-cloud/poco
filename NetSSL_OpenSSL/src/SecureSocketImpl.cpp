@@ -371,6 +371,9 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 		else
 			return rc;
 	}
+    SocketAddress peerAddr = _pSocket->peerAddress();
+std::string addr = peerAddr.host().toString();
+printf("%s %d before SSL read length %d addr %s \n", __func__, __LINE__, length, addr.c_str());
 	do
 	{
 		rc = SSL_read(_pSSL, buffer, length);
@@ -488,8 +491,16 @@ bool SecureSocketImpl::mustRetry(int rc)
 			{
 				if (_pSocket->poll(_pSocket->getReceiveTimeout(), Poco::Net::Socket::SELECT_READ))
 					return true;
-				else
+				else{                
+    SocketAddress peerAddr = _pSocket->peerAddress();
+std::string addr = peerAddr.host().toString();
+printf("%s %d before throw ssl addr %s seconds %ld milli %ld  micro  %ld \n",
+             __func__, __LINE__, addr.c_str(),
+             _pSocket->getReceiveTimeout().totalSeconds(),
+             _pSocket->getReceiveTimeout().totalMilliseconds(),
+             _pSocket->getReceiveTimeout().totalMicroseconds());
 					throw Poco::TimeoutException();
+                }
 			}
 			break;
 		case SSL_ERROR_WANT_WRITE:
@@ -498,7 +509,16 @@ bool SecureSocketImpl::mustRetry(int rc)
 				if (_pSocket->poll(_pSocket->getSendTimeout(), Poco::Net::Socket::SELECT_WRITE))
 					return true;
 				else
+                {
+                    SocketAddress peerAddr = _pSocket->peerAddress();
+                    std::string addr = peerAddr.host().toString();
+                    printf("%s %d before throw SSL  addr %s seconds %ld milli %ld  micro  %ld \n",
+                    __func__, __LINE__, addr.c_str(),
+                    _pSocket->getReceiveTimeout().totalSeconds(),
+                    _pSocket->getReceiveTimeout().totalMilliseconds(),
+                    _pSocket->getReceiveTimeout().totalMicroseconds());
 					throw Poco::TimeoutException();
+                    }
 			}
 			break;
 		case SSL_ERROR_SYSCALL:

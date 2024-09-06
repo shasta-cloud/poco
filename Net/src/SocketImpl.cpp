@@ -383,10 +383,8 @@ std::string addr = peerAddr.host().toString();
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 		rc = ::recv(_sockfd, reinterpret_cast<char*>(buffer), length, flags);
-        if (addr == "122.176.39.60" || addr == "72.139.48.174")
-        {
-            printf("%s %d past ::recv ret is %d errno is %d length %d \n", __func__, __LINE__, rc, lastError(), length);
-        }
+        //if (addr == "122.176.39.60" || addr == "72.139.48.174")
+            printf("%s %d past ::recv ret is %d errno is %d length %d addr %s \n", __func__, __LINE__, rc, lastError(), length, addr);
 
 	}
 	while (_blocking && rc < 0 && lastError() == POCO_EINTR);

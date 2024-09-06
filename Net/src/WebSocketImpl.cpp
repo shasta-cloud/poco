@@ -219,10 +219,12 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Tim
 	bool useMask;
 	_frameFlags = 0;
 	int payloadLength = receiveHeader(mask, useMask);
-	if (payloadLength <= 0)
-		return payloadLength;
+	if (payloadLength <= 0){
+    printf("%s %d payloadLength is %d errno %d \n", __func__, __LINE__, payloadLength, errno);
+		return payloadLength;}
 	std::size_t oldSize = buffer.size();
 	buffer.resize(oldSize + payloadLength);
+    printf("%s %d payloadLength %d oldSize %d \n", __func__, __LINE__, payloadLength, oldSize);
 	return receivePayload(buffer.begin() + oldSize, payloadLength, mask, useMask);
 }
 

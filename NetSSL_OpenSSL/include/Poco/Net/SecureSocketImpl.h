@@ -161,15 +161,6 @@ public:
 		/// underlying TCP connection. No orderly SSL shutdown
 		/// is performed.
 
-	void setBlocking(bool flag);
-		/// Sets the socket in blocking mode if flag is true,
-		/// disables blocking mode if flag is false.
-
-	bool getBlocking() const;
-		/// Returns the blocking mode of the socket.
-		/// This method will only work if the blocking modes of
-		/// the socket are changed via the setBlocking method!
-
 	int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Sends the contents of the given buffer through
 		/// the socket. Any specified flags are ignored.
@@ -239,6 +230,12 @@ public:
 		/// Returns true iff a reused session was negotiated during
 		/// the handshake.
 
+    SocketImpl* socket();
+		/// Returns the underlying SocketImpl.
+
+	const SocketImpl* socket() const;
+		/// Returns the underlying SocketImpl.
+
 protected:
 	void acceptSSL();
 		/// Performs a server-side SSL handshake and certificate verification.
@@ -299,6 +296,19 @@ private:
 //
 // inlines
 //
+
+inline SocketImpl* SecureSocketImpl::socket()
+{
+	return _pSocket.get();
+}
+
+
+inline const SocketImpl* SecureSocketImpl::socket() const
+{
+	return _pSocket.get();
+}
+
+
 inline poco_socket_t SecureSocketImpl::sockfd()
 {
 	return _pSocket->sockfd();

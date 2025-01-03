@@ -120,11 +120,22 @@ public:
 	void shutdownSend();
 		/// Shuts down the receiving part of the socket connection.
 		///
-		/// Since SSL does not support a half shutdown, this does
-		/// nothing.
-
-	void shutdown();
-		/// Shuts down the SSL connection.
+        /// Sends a close notify shutdown alert message to the peer
+		/// (if not sent yet), then calls shutdownSend() on the
+		/// underlying socket.
+		///
+		/// Returns 0 if the message has been sent.
+		/// Returns 1 if the message has been sent, but the peer
+		/// has not yet sent its shutdown alert message.
+		/// In case of a non-blocking socket, returns < 0 if the
+		/// message cannot be sent at the moment. In this case,
+		/// the call to shutdownSend() must be retried after the
+		/// underlying socket becomes writable again.
+    
+    int shutdown();
+        ///Shuts down the SSL connection.
+        ///
+        /// Same as ShutdownSend().
 
 	void abort();
 		/// Aborts the connection by closing the underlying
@@ -197,6 +208,11 @@ public:
 		/// Returns true iff a reused session was negotiated during
 		/// the handshake.
 
+    // SocketImpl
+	virtual void setBlocking(bool flag) override;
+	virtual bool getBlocking() const override;
+	virtual void setRawOption(int level, int option, const void* value, poco_socklen_t length) override;
+	virtual void getRawOption(int level, int option, void* value, poco_socklen_t& length) override;
 protected:
 	void acceptSSL();
 		/// Performs a SSL server-side handshake.

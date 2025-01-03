@@ -533,15 +533,15 @@ void WebSocketImpl::shutdownReceive()
 }
 
 
-void WebSocketImpl::shutdownSend()
+int WebSocketImpl::shutdownSend()
 {
-	_pStreamSocketImpl->shutdownSend();
+	return _pStreamSocketImpl->shutdownSend();
 }
 
 
-void WebSocketImpl::shutdown()
+int WebSocketImpl::shutdown()
 {
-	_pStreamSocketImpl->shutdown();
+	return _pStreamSocketImpl->shutdown();
 }
 
 
